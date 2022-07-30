@@ -1,0 +1,100 @@
+from pyamaze import maze, agent, COLOR, textLabel
+
+def BFS(m):
+	#start node is the last node
+	start = (m.rows, m.cols)
+	frontier = [start]
+	explored = [start]
+
+	#stores child-current as key-val for path
+	bfs_path={}
+
+	#repeat until goal is reached or frontier is empty
+	while len(frontier)>0:
+		curr_cell=frontier.pop(0)
+		
+		if curr_cell==(1, 1):
+			break
+
+		for d in 'ESNW':
+			if m.maze_map[curr_cell][d]==True:
+				if d=='E':
+					child_cell=(curr_cell[0], curr_cell[1]+1)
+				elif d=='W':
+					child_cell=(curr_cell[0],curr_cell[1]-1)
+				elif d=='N':
+					child_cell=(curr_cell[0]-1,curr_cell[1])
+				elif d=='S':
+					child_cell=(curr_cell[0]+1,curr_cell[1])
+				if child_cell in explored:
+					continue
+				frontier.append(child_cell)
+				explored.append(child_cell)
+				bfs_path[child_cell]=curr_cell
+    #restore the original path
+	fwd_path={}
+	cell = (1, 1)
+	while cell!=start:
+		fwd_path[bfs_path[cell]]=cell
+		cell = bfs_path[cell]
+	return fwd_path
+
+def DFS(m):
+	#start node is the last node
+	start = (m.rows, m.cols)
+	frontier = [start]
+	explored = [start]
+
+	#stores child-current as key-val for path
+	dfs_path={}
+
+	#repeat until goal is reached or frontier is empty
+	while len(frontier)>0:
+		curr_cell=frontier.pop(len(frontier)-1)
+		
+		if curr_cell==(1, 1):
+			break
+
+		for d in 'ESNW':
+			if m.maze_map[curr_cell][d]==True:
+				if d=='E':
+					child_cell=(curr_cell[0], curr_cell[1]+1)
+				elif d=='W':
+					child_cell=(curr_cell[0],curr_cell[1]-1)
+				elif d=='N':
+					child_cell=(curr_cell[0]-1,curr_cell[1])
+				elif d=='S':
+					child_cell=(curr_cell[0]+1,curr_cell[1])
+				if child_cell in explored:
+					continue
+				frontier.append(child_cell)
+				explored.append(child_cell)
+				dfs_path[child_cell]=curr_cell
+    #restore the original path
+	fwd_path={}
+	cell = (1, 1)
+	while cell!=start:
+		fwd_path[dfs_path[cell]]=cell
+		cell = dfs_path[cell]
+	return fwd_path
+
+
+if __name__=='__main__':
+	m=maze(10, 10)
+	m.CreateMaze(loopPercent=40)
+
+	path=BFS(m)
+	path1 = DFS(m)
+
+	#bfs path visualization
+	a=agent(m, shape='arrow', footprints=True, filled=True)
+	m.tracePath({a:path})
+
+    #bfs path visualization
+	a1=agent(m, shape='square', footprints=True, filled=True)
+	m.tracePath({a1:path1})
+
+	l=textLabel(m, 'Length of the Shortest Path', len(path)+1)
+	l1=textLabel(m, 'Length of the Shortest Path1', len(path1)+1)
+
+	m.run()
